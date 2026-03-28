@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('/src/assets/fonts/SpaceGrotesk-VariableFont_wght.ttf') format('truetype');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+/* @keyframes blink {
+  50% { opacity: 0; }
+} */
+/* .dynamic-tagline::after {
+  content: '|';
+  animation: blink 1s step-start infinite;
+  margin-left: 4px;
+  color: #191A23;
+}.gradient-bg {
+  background: linear-gradient(
+    180deg,
+    rgba(200, 200, 200, 0.6) 0%,
+    rgba(200, 200, 200, 0.3) 40%,
+    rgba(200, 200, 200, 0.1) 70%,
+    rgba(200, 200, 200, 0) 100%
+  );
+  backdrop-filter: blur(20px);
+} */
+/* @keyframes gridMove {
+  from { background-position: 0 0; }
+  to { background-position: 35px 35px; }
+} */
