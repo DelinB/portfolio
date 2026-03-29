@@ -1,9 +1,7 @@
-import React, { useState } from 'react'
+import  { useState } from 'react'
 import { Routes, Route } from "react-router-dom";import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-
 import Footer from './pages/Footer.jsx';
-import BlogDetails from './pages/BlogDetails.jsx';
 import Portfolio from './pages/Portfolio.jsx';
 
 const App = () => {
