@@ -120,7 +120,7 @@ const DelinPremiumHero = ({ id }) => {
                   transition={{ duration: 0.5 }}
                   className="text-5xl sm:text-7xl md:text-8xl font-bold tracking-tight leading-[1] md:leading-[0.9] mb-10 will-change-transform uppercase"
                 >
-                  <TypewriterText text={SLIDES[currentSlide].heroText.top} /> <br />
+                  <TypewriterText  text={SLIDES[currentSlide].heroText.top} /> <br />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-400 to-white/20">
                     <TypewriterText text={SLIDES[currentSlide].heroText.middle} />
                   </span> <br />
