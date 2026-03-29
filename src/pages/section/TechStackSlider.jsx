@@ -2,8 +2,10 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { 
   SiNextdotjs, SiReact, SiTypescript, SiTailwindcss, 
-  SiRedux, SiNodedotjs, SiFramer, SiPostgresql 
+  SiRedux, SiNodedotjs, SiFramer, SiPostgresql, 
+  SiHtml5   
 } from 'react-icons/si';
+import { FaCss3Alt } from 'react-icons/fa';
 
 const TechStackSlider = () => {
   const techStack = [
@@ -12,9 +14,13 @@ const TechStackSlider = () => {
     { name: "TypeScript", icon: <SiTypescript />, color: "hover:text-[#3178C6]" },
     { name: "Tailwind", icon: <SiTailwindcss />, color: "hover:text-[#06B6D4]" },
     { name: "Redux", icon: <SiRedux />, color: "hover:text-[#764ABC]" },
-    { name: "Node.js", icon: <SiNodedotjs />, color: "hover:text-[#339933]" },
-    { name: "Framer", icon: <SiFramer />, color: "hover:text-[#0055FF]" },
-    { name: "PostgreSQL", icon: <SiPostgresql />, color: "hover:text-[#4169E1]" },
+      // HTML + CSS
+  { name: "HTML5", icon: <SiHtml5 />, color: "hover:text-[#E34F26]" },
+  { name: "CSS3", icon: <FaCss3Alt    />, color: "hover:text-[#1572B6]" },
+
+  // Zustand
+  // { name: "Zustand", icon: <SiZustand />, color: "hover:text-[#443E38]" }
+    
   ];
 
   // Duplicate the array to create the seamless loop effect

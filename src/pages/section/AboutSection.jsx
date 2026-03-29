@@ -6,7 +6,8 @@ import TechStackSlider from './TechStackSlider';
 
 const AboutSection = () => {
   return (
-<section id="about" className="relative py-10 bg-[#050505] text-white overflow-x-hidden scroll-mt-20">      {/* Background Typography Watermark */}
+    <>
+    <section id="about" className="relative py-20 md:py-32 bg-[#050505] text-white overflow-x-hidden scroll-mt-20">      {/* Background Typography Watermark */}
       <div className="absolute top-0 right-0 text-[20vw] font-black text-white/[0.02] leading-none select-none pointer-events-none">
         DELIN
       </div>
@@ -46,18 +47,18 @@ const AboutSection = () => {
               className="space-y-6 text-lg text-slate-400 font-light max-w-2xl"
             >
               <p>
-                Based in <span className="text-white font-medium">Tamil Nadu, India</span>[cite: 2], I am a Frontend Engineer driven by the challenge of building 
-                <span className="text-white font-medium"> production-grade applications</span> that don't just work—they perform[cite: 4, 15].
+                Based in <span className="text-white font-medium">Tamil Nadu, India</span>, I am a Frontend Engineer driven by the challenge of building 
+                <span className="text-white font-medium"> production-grade applications</span> that don't just work—they perform.
               </p>
               <p>
-                My journey began as a trainee at <span className="text-[#B9FF66] font-mono">Spangless Infotech</span>, where I mastered the foundations of React and REST APIs while building hospital management systems[cite: 32, 34]. Today, at <span className="text-[#B9FF66] font-mono">Dhina Technologies</span>, I architect scalable interfaces and real-time systems using Redux Toolkit and WebSockets[cite: 17, 21, 25].
+                My journey began as a trainee at <span className="text-[#B9FF66] font-mono">Spangless Infotech</span>, where I mastered the foundations of React and REST APIs while building hospital management systems. Today, at <span className="text-[#B9FF66] font-mono">Dhina Technologies</span>, I architect scalable interfaces and real-time systems using Redux Toolkit and WebSockets.
               </p>
             </motion.div>
 
             <div className="flex flex-wrap gap-8 pt-6">
               <div className="space-y-1">
                 <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold">Experience</p>
-                <p className="text-2xl font-bold">1+ Years [cite: 4]</p>
+                <p className="text-2xl font-bold">1+ Years </p>
               </div>
               <div className="h-12 w-px bg-white/10 hidden sm:block" />
               <div className="space-y-1">
@@ -82,7 +83,7 @@ const AboutSection = () => {
                 <div className="flex justify-between items-start">
                   <div className="space-y-1">
                     <p className="text-[10px] font-mono text-[#B9FF66]">LOCATION_SYNC</p>
-                    <p className="text-sm flex items-center gap-2"><MapPin size={12}/> India [cite: 2]</p>
+                    <p className="text-sm flex items-center gap-2"><MapPin size={12}/> India</p>
                   </div>
                   <Sparkles size={20} className="text-slate-600" />
                 </div>
@@ -94,7 +95,7 @@ const AboutSection = () => {
                       <span className="text-xs font-bold uppercase tracking-widest">Philosophy</span>
                     </div>
                     <p className="text-xs text-slate-400 leading-relaxed italic">
-                      "Clean code is not just written; it's engineered for scale and speed." [cite: 6]
+                      "Clean code is not just written; it's engineered for scale and speed." 
                     </p>
                   </div>
 
@@ -118,14 +119,17 @@ const AboutSection = () => {
               transition={{ duration: 4, repeat: Infinity }}
               className="absolute -top-6 -right-6 px-6 py-3 bg-white text-black rounded-full font-black text-xs rotate-6"
             >
-              FRONTEND_ENGINEER [cite: 18]
+              FRONTEND_ENGINEER
             </motion.div>
           </motion.div>
 
         </div>
       </div>
-   <TechStackSlider />
     </section>
+       <TechStackSlider />
+
+    </>
+
     
   );
 };

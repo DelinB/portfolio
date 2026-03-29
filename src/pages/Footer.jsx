@@ -21,7 +21,7 @@ const OmniZenithFooter = () => {
   return (
     <footer 
       ref={footerRef}
-      className="relative bg-[#020202] text-white pt-16 md:pt-32 pb-8 overflow-hidden border-t border-white/5 font-sans"
+      className="relative bg-[#020202] text-white  pt-16 md:pt-32 pb-8 overflow-hidden border-t border-white/5 font-sans"
     >
       {/* 1. ADAPTIVE KINETIC STRIP (Hidden on smallest screens for clarity) */}
       <div className="absolute top-10 left-0 w-full pointer-events-none select-none overflow-hidden opacity-[0.02] hidden sm:block">
@@ -56,18 +56,20 @@ const OmniZenithFooter = () => {
                 <span className="text-[#B9FF66]">BUILDING</span>
               </h2>
             </motion.div>
+<div className="inline-block">
+ <a
+  href="https://mail.google.com/mail/?view=cm&fs=1&to=delin.b.23@gmail.com"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="group flex items-center gap-4 md:gap-6 text-xl sm:text-2xl md:text-4xl lg:text-5xl font-light tracking-tight hover:text-[#B9FF66] transition-all duration-500 break-all sm:break-normal"
+>
+  delin.b.23@gmail.com
 
-            <div className="inline-block group">
-              <a 
-                href="mailto:delin.b.23@gmail.com" 
-                className="flex items-center gap-4 md:gap-6 text-xl sm:text-2xl md:text-4xl lg:text-5xl font-light tracking-tight hover:text-[#B9FF66] transition-all duration-500 break-all sm:break-normal"
-              >
-                delin.b.23@gmail.com
-                <div className="p-3 md:p-4 rounded-full border border-white/10 bg-white/5 backdrop-blur-xl group-hover:bg-[#B9FF66] group-hover:text-black transition-all">
-                  <ArrowUpRight className="w-5 h-5 md:w-8 md:h-8" />
-                </div>
-              </a>
-            </div>
+  <div className="p-3 md:p-4 rounded-full border border-white/10 bg-white/5 backdrop-blur-xl group-hover:bg-[#B9FF66] group-hover:text-black transition-all">
+    <ArrowUpRight className="w-5 h-5 md:w-8 md:h-8" />
+  </div>
+</a>
+</div>
           </div>
 
           {/* RIGHT: DATA CHANNELS */}
@@ -76,8 +78,10 @@ const OmniZenithFooter = () => {
                 <div className="space-y-4 md:space-y-6">
                   <p className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em]">Social</p>
                   <ul className="space-y-2 md:space-y-3">
-                    <li><a href="https://github.com/delin-b" className="text-sm text-white/40 hover:text-white transition-colors">GitHub</a></li>
-                    <li><a href="#" className="text-sm text-white/40 hover:text-white transition-colors">LinkedIn</a></li>
+                    <li><a  target="_blank"
+      rel="noopener noreferrer" href="https://github.com/DelinB" className="text-sm text-white/40 hover:text-white transition-colors">GitHub</a></li>
+                    <li><a  target="_blank"
+      rel="noopener noreferrer" href="www.linkedin.com/in/delin-b-dev" className="text-sm text-white/40 hover:text-white transition-colors">LinkedIn</a></li>
                   </ul>
                 </div>
                 <div className="space-y-4 md:space-y-6">

@@ -30,7 +30,8 @@ const SkillsSection = () => {
   ];
 
   return (
-    <section className="relative pt-20 pb-10 bg-[#050505] text-white overflow-hidden">
+    <>
+     <section className="relative py-20 md:py-32 bg-[#050505] text-white overflow-hidden">
       {/* Background Grid Accent */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
            style={{ backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`, backgroundSize: '40px 40px' }} />
@@ -115,7 +116,9 @@ const SkillsSection = () => {
           </div>
         </motion.div> */}
       </div>
-      <div className="mt-16 overflow-hidden py-4 border-y border-white/5 relative">
+     
+    </section>
+     <div className=" overflow-hidden py-4 border-y border-white/5 relative bg-[#050505] ">
           <div className="flex animate-marquee whitespace-nowrap gap-12 text-slate-600 font-mono text-[10px] uppercase tracking-[0.3em]">
             <span>Problem Solving</span>
             <span>Scalable Architecture</span>
@@ -140,8 +143,8 @@ const SkillsSection = () => {
           display: inline-flex;
           animation: marquee 30s linear infinite;
         }
-      `}</style>
-    </section>
+      `}</style></>
+   
   );
 };
 

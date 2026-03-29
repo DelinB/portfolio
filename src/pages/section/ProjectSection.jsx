@@ -164,7 +164,7 @@ const ProjectSection = () => {
   };
 
   return (
-    <div className="relative py-10 bg-[#050505] text-white overflow-hidden scroll-mt-[120px]">
+    <div className="relative py-20 md:py-32 bg-[#050505] text-white overflow-hidden scroll-mt-[120px]">
       {/* Background Ambient Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[600px] bg-[#B9FF66]/5 blur-[160px] rounded-full pointer-events-none" />
 
@@ -249,10 +249,10 @@ const ProjectSection = () => {
                 </li>
               ))}
             </ul>
-            <button className="mt-auto w-full py-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center gap-3 hover:bg-white hover:text-black transition-all group/btn">
+            {/* <button className="mt-auto w-full py-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center gap-3 hover:bg-white hover:text-black transition-all group/btn">
               <span className="text-xs font-bold uppercase tracking-widest">Live View</span>
               <ExternalLink size={16} className="group-hover/btn:translate-x-1 transition-transform" />
-            </button>
+            </button> */}
           </motion.div>
 
           {/* 3. Performance Metric (Mini Card) */}
