@@ -97,7 +97,6 @@ const DelinPremiumHero = ({ id }) => {
   return (
     <section id={id} className="relative min-h-screen bg-[#050505] text-white selection:bg-[#B9FF66] overflow-hidden font-sans">
       
-      {/* Background Gradients */}
       <motion.div style={{ y: y1 }} className="absolute top-[-10%] right-[-5%] w-[400px] md:w-[800px] h-[400px] md:h-[800px] bg-[#B9FF66]/10 blur-[120px] rounded-full will-change-transform" />
       <motion.div style={{ y: y2 }} className="absolute bottom-[-10%] left-[-5%] w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-blue-500/10 blur-[120px] rounded-full will-change-transform" />
 
