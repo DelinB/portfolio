@@ -146,7 +146,6 @@ const DelinPremiumHero = ({ id }) => {
             </motion.div>
           </div>
 
-          {/* RIGHT CONTENT: THE PREMIUM CARD */}
           <div className="w-full lg:col-span-5 relative group">
             <div className="absolute -inset-[1px] bg-gradient-to-b from-white/20 to-transparent rounded-[40px] opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="relative bg-[#0A0A0A]/90 backdrop-blur-3xl border border-white/10 p-8 md:p-10 rounded-[40px] overflow-hidden min-h-[500px] flex flex-col justify-between">
