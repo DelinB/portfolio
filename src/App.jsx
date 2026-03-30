@@ -1,11 +1,13 @@
-import  { useState } from 'react'
-import { Routes, Route } from "react-router-dom";import { useEffect } from "react";
+import { useState } from 'react'
+import { Routes, Route } from "react-router-dom"; import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Footer from './pages/Footer.jsx';
 import Portfolio from './pages/Portfolio.jsx';
+import InvoicePage from './pages/invoice/pages/InvoicePage.jsx';
+import InvoiceDetails from './pages/invoice/pages/InvoiceDetails.jsx';
 
 const App = () => {
-    const location = useLocation();
+  const location = useLocation();
   const [lang, setLang] = useState("en");
 
   useEffect(() => {
@@ -17,13 +19,14 @@ const App = () => {
     }
   }, [location]);
   return (
-    <>      
-   
+    <>
+
       <Routes>
-        <Route path="/" element={<Portfolio lang={lang}/>} />
-          
+        <Route path="/" element={<Portfolio lang={lang} />} />
+        <Route path="/invoice" element={<InvoicePage  lang={lang} />} />
+      <Route path="/invoice/:id" element={<InvoiceDetails />} />
       </Routes>
-   
+
       <Footer />
     </>
   )
