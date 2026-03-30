@@ -1,10 +1,9 @@
 
 
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import dazele from "../assets/dazele.png";
 import { getTranslation } from './i18n'; import TechStackSlider from './section/TechStackSlider';
 import AboutSection from './section/AboutSection';
 import HeroSection from './section/HeroSection';
@@ -26,9 +25,9 @@ export default function Portfolio({ lang, setLang }) {
 
 
 
-
   return (
     <div ref={component} className="font-['Space_Grotesk'] bg-white text-[#191A23] selection:bg-[#B9FF66] selection:text-black overflow-x-hidden ">
+      
       <Navbarnew />
       <section id="home"><HeroSection /></section>
       <section id="about" className="scroll-mt-[10px]">

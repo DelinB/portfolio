@@ -4,7 +4,6 @@ import { useLocation } from "react-router-dom";
 import Footer from './pages/Footer.jsx';
 import Portfolio from './pages/Portfolio.jsx';
 import InvoicePage from './pages/invoice/pages/InvoicePage.jsx';
-import InvoiceDetails from './pages/invoice/pages/InvoiceDetails.jsx';
 
 const App = () => {
   const location = useLocation();
@@ -24,7 +23,6 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Portfolio lang={lang} />} />
         <Route path="/invoice" element={<InvoicePage  lang={lang} />} />
-      <Route path="/invoice/:id" element={<InvoiceDetails />} />
       </Routes>
 
       <Footer />

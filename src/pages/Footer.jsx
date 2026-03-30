@@ -5,6 +5,7 @@ import {
   Terminal, Globe, ShieldCheck, Zap, 
   Cpu
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const OmniZenithFooter = () => {
   const currentYear = new Date().getFullYear();
@@ -17,7 +18,11 @@ const OmniZenithFooter = () => {
   });
   
   const xTranslate = useTransform(scrollYProgress, [0, 1], [0, -400]);
+const navigate = useNavigate();
 
+  const handleNavigate = () => {
+    navigate("/invoice");
+  };
   return (
     <footer 
       ref={footerRef}
@@ -116,7 +121,7 @@ const OmniZenithFooter = () => {
           <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-10">
             <div className="flex items-center gap-2">
                <Terminal size={12} className="text-[#B9FF66]" />
-               <span className="text-[9px] font-mono text-white/20 uppercase tracking-widest">Build_4.0.2</span>
+               <span  onClick={handleNavigate}  className="text-[9px] font-mono text-white/20 uppercase tracking-widest">Build_4.0.2</span>
             </div>
             <div className="flex items-center gap-2">
                <Cpu size={12} className="text-white/20" />
