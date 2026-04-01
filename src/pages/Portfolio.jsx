@@ -33,6 +33,7 @@ export default function Portfolio({ lang, setLang }) {
       <section id="about" className="scroll-mt-[10px]">
         <AboutSection />
       </section>
+      
       {/*  */}
       <section id="stack">  <SkillsSection /></section>
       <section className='!scroll-mt-[120px]' id="projects">
