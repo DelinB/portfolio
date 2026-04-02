@@ -1,3 +1,7 @@
+
+
+
+
 "use client";
 import React, { forwardRef } from "react";
 
@@ -5,9 +9,11 @@ const ModernInvoice = forwardRef(({ invoice }, ref) => {
   const subtotal = invoice.items?.reduce((acc, item) => acc + (parseFloat(item.quantity) * parseFloat(item.price) || 0), 0) || 0;
   const taxAmount = (subtotal * (parseFloat(invoice.tax) || 0)) / 100;
   const total = subtotal + taxAmount;
-
+const amountPaid = parseFloat(invoice.paidAmount) || 0;
+  const balanceDue = total - amountPaid;
   const brandGradient = "linear-gradient(135deg, #FF6A3D 0%, #B900FF 50%, #0099FF 100%)";
-
+const formatUnit = (value, singular, plural) =>
+  `${value} ${value === 1 ? singular : plural}`;
   return (
     <div ref={ref} id="invoice-capture" style={sheetStyle}>
       {/* HEADER */}
@@ -40,7 +46,7 @@ const ModernInvoice = forwardRef(({ invoice }, ref) => {
             <span style={{ fontSize: "22px", fontWeight: "800" }}>
               {invoice.currency}{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
             </span>
-            <span style={{ fontSize: "10px", opacity: 0.9 }}>Including GST ({invoice.tax}%)</span>
+          {invoice.tax &&  <span style={{ fontSize: "10px", opacity: 0.9 }}>Including GST ({invoice.tax}%)</span>}
           </div>
           {invoice.dueDate && <div style={{ fontSize: "12px", fontWeight: "700" }}>Due: {invoice.dueDate}</div>}
         </div>
@@ -59,8 +65,9 @@ const ModernInvoice = forwardRef(({ invoice }, ref) => {
           {invoice.items.map((item) => (
             <div key={item.id} style={tableRow}>
               <span style={{ flex: 3, fontWeight: "700", color: "#0f172a" }}>{item.description}</span>
-              <span style={{ flex: 1, textAlign: "center" }}>{item.quantity}</span>
-              <span style={{ flex: 1, textAlign: "right" }}>{parseFloat(item.price).toFixed(2)}</span>
+<span style={{ flex: 1, textAlign: "center" }}>
+  {formatUnit(item.quantity, "", "")}
+</span>          <span style={{ flex: 1, textAlign: "right" }}>{parseFloat(item.price).toFixed(2)}</span>
               <span style={{ flex: 1, textAlign: "right", fontWeight: "800", color: "#B900FF" }}>
                 {(parseFloat(item.quantity) * parseFloat(item.price) || 0).toFixed(2)}
               </span>
@@ -68,12 +75,23 @@ const ModernInvoice = forwardRef(({ invoice }, ref) => {
           ))}
         </div>
 
-        <div style={summarySection}>
+        {/* <div style={summarySection}>
           <div style={sumRow}><span>Subtotal</span><span>{invoice.currency}{subtotal.toFixed(2)}</span></div>
-          <div style={sumRow}><span>Tax ({invoice.tax}%)</span><span>{invoice.currency}{taxAmount.toFixed(2)}</span></div>
+         {invoice.tax &&    <div style={sumRow}><span>Tax ({invoice.tax}%)</span><span>{invoice.currency}{taxAmount.toFixed(2)}</span></div>}
           <div style={{ ...totalRow, color: "#B900FF" }}>
             <span>Grand Total</span>
             <span>{invoice.currency}{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+          </div>
+        </div> */}
+
+        <div style={summarySection}>
+          <div style={sumRow}><span>Subtotal</span><span>{invoice.currency}{subtotal.toFixed(2)}</span></div>
+          {invoice.tax &&   <div style={sumRow}><span>Tax ({invoice.tax}%)</span><span>{invoice.currency}{taxAmount.toFixed(2)}</span></div>}
+          <div style={{...sumRow, fontWeight: "bold"}}><span>Grand Total</span><span>{invoice.currency}{total.toFixed(2)}</span></div>
+          {invoice.paidAmount &&  <div style={{...sumRow, color: "#10b981"}}><span>Advance Paid</span><span>- {invoice.currency}{amountPaid.toFixed(2)}</span></div>}
+          <div style={{ ...totalRow, color: "#B900FF" }}>
+            <span>Balance Due</span>
+            <span>{invoice.currency}{balanceDue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
           </div>
         </div>
       </div>

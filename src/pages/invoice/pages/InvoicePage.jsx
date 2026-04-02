@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef } from "react";
@@ -16,9 +17,10 @@ export default function InvoicePage() {
     date: "30 Mar, 2026",
     dueDate: "15 Apr, 2026",
     currency: "₹",
-    tax: 18,
+    tax: 
+    18,paidAmount: 0,
     col1Label: "Description",
-    col2Label: "Timing / Qty",
+    col2Label: "Timing ",
     col3Label: "Rate",
     col4Label: "Total",
     // ISSUED BY
@@ -39,7 +41,19 @@ export default function InvoicePage() {
       items: invoice.items.map(item => item.id === id ? { ...item, [field]: value } : item)
     });
   };
+const handleLogoUpload = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
+  const reader = new FileReader();
+  reader.onloadend = () => {
+    setInvoice(prev => ({
+      ...prev,
+      logo: reader.result
+    }));
+  };
+  reader.readAsDataURL(file);
+};
   return (
     <div style={{ background: "#f1f5f9", minHeight: "100vh", display: "flex", padding: "40px", gap: "40px" }}>
       <style jsx global>{`
@@ -53,7 +67,23 @@ export default function InvoicePage() {
 
       <div className="sidebar-scroll" style={sidebarStyle}>
         <h2 style={{ fontSize: "22px", fontWeight: "900", marginBottom: "25px", color: "#0f172a" }}>Invoice Editor</h2>
-        
+        <div style={{ marginBottom: "12px" }}>
+  <button
+    type="button"
+    style={addBtn}
+    onClick={() => fileInputRef.current.click()}
+  >
+    Upload Logo
+  </button>
+
+  <input
+    type="file"
+    ref={fileInputRef}
+    accept="image/*"
+    style={{ display: "none" }}
+    onChange={handleLogoUpload}
+  />
+</div>
         {/* ISSUED BY SECTION */}
         <div style={sectionBox}>
           <label style={labelHint}>Issued By (Your Info)</label>
@@ -83,6 +113,20 @@ export default function InvoicePage() {
           <div style={{...grid2, marginTop: "8px"}}>
             <input type="number" style={inputStyle} value={invoice.tax} onChange={(e) => setInvoice({...invoice, tax: e.target.value})} placeholder="Tax %" />
             <input style={inputStyle} value={invoice.currency} onChange={(e) => setInvoice({...invoice, currency: e.target.value})} placeholder="Currency" />
+          </div>
+        </div>
+        <div style={sectionBox}>
+          <label style={labelHint}>Payment Status</label>
+          <div style={grid2}>
+            <div style={{display: 'flex', flexDirection: 'column'}}>
+               <span style={{fontSize: '10px', color: '#64748b'}}>Advance Paid</span>
+               <input 
+                 type="number" 
+                 style={inputStyle} 
+                 value={invoice.paidAmount} 
+                 onChange={(e) => setInvoice({...invoice, paidAmount: e.target.value})} 
+               />
+            </div>
           </div>
         </div>
 
@@ -118,3 +162,4 @@ const grid2 = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" };
 const deleteBtn = { background: "#fee2e2", color: "#ef4444", border: "none", borderRadius: "8px", width: "30px", cursor: "pointer" };
 const addBtn = { width: "100%", padding: "10px", background: "none", border: "2px dashed #e2e8f0", borderRadius: "10px", cursor: "pointer", color: "#64748b", fontWeight: "700" };
 const downloadBtn = { width: "100%", padding: "18px", background: "linear-gradient(135deg, #FF6A3D 0%, #B900FF 100%)", color: "#fff", border: "none", borderRadius: "14px", fontWeight: "800", cursor: "pointer" };
+
