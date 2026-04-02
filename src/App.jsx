@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import Footer from './pages/Footer.jsx';
 import Portfolio from './pages/Portfolio.jsx';
 import InvoicePage from './pages/invoice/pages/InvoicePage.jsx';
+import InvoicePreview from './pages/invoice/pages/InvoicePreview.jsx';
 
 const App = () => {
   const location = useLocation();
@@ -23,9 +24,10 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Portfolio lang={lang} />} />
         <Route path="/invoice" element={<InvoicePage  lang={lang} />} />
+                <Route path="/invoice/preview" element={<InvoicePreview  lang={lang} />} />
+
       </Routes>
 
-      <Footer />
     </>
   )
 }

@@ -1,165 +1,479 @@
+import React, { useState, useRef, useCallback } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import html2pdf from 'html2pdf.js';
+import { Calendar, MailIcon, PhoneCall } from 'lucide-react';
+import { IoLocationOutline } from "react-icons/io5";
+import InvoicePreview from './InvoicePreview';
 
-"use client";
+const InvoiceGenerator = () => {
+  // Date Groups State
+  const [groups, setGroups] = useState([
+    {
+      id: uuidv4(),
+      date: "26 Mar 2026",
+      items: [
+        { id: uuidv4(), description: "Video Editing Services", quantity: "5", price: "2000" },
+        { id: uuidv4(), description: "Shoot Cancelled", quantity: "2", price: "2000" }
+      ]
+    },
+    {
+      id: uuidv4(),
+      date: "30 Mar 2026",
+      items: [
+        { id: uuidv4(), description: "New Service", quantity: "1", price: "0" }
+      ]
+    }
+  ]);
 
-import { useState, useRef } from "react";
-import { v4 as uuidv4 } from "uuid";
-import ModernInvoice from "../components/ModernInvoice";
-import { downloadInvoice } from "../utils/downloadInvoice";
-
-export default function InvoicePage() {
-  const invoiceRef = useRef(null);
-  const fileInputRef = useRef(null);
-  const [isGenerating, setIsGenerating] = useState(false);
-
-  const [invoice, setInvoice] = useState({
-    id: "INV-2026-001",
+  const [companyInfo, setCompanyInfo] = useState({
     logo: null,
-    date: "30 Mar, 2026",
-    dueDate: "15 Apr, 2026",
-    currency: "₹",
-    tax: 
-    18,paidAmount: 0,
-    col1Label: "Description",
-    col2Label: "Timing ",
-    col3Label: "Rate",
-    col4Label: "Total",
-    // ISSUED BY
-    companyName: "Panda Media",
-    companyAddress: "123 Street, Chennai,\nTamil Nadu, India",
-    taxId: "GSTIN 33AAAAA0000A1Z5",
-    phone: "+91 98765 43210", // NEW
-    email: "client@gmail.com", // NEW
-    // BILL TO
-    clientName: "Client Name",
-    clientAddress: "Client Office Address,\nCity, State",
-    items: [{ id: uuidv4(), description: "Video Editing Services", quantity: "5", price: "2000" }],
+    name: "Panda Media",
+    address: "123 Street, Chennai,\nTamil Nadu, India",
+    taxId: "GSTIN 33AAAAA0000A12S",
+    phone: "+91 98765 43210",
+    email: "client@pandamedia.com"
   });
 
-  const updateItem = (id, field, value) => {
-    setInvoice({
-      ...invoice,
-      items: invoice.items.map(item => item.id === id ? { ...item, [field]: value } : item)
-    });
-  };
-const handleLogoUpload = (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+  const [clientInfo, setClientInfo] = useState({
+    name: "Creative Studio LLP",
+    address: "MG Road, Bangalore,\nKarnataka, India"
+  });
 
-  const reader = new FileReader();
-  reader.onloadend = () => {
-    setInvoice(prev => ({
-      ...prev,
-      logo: reader.result
-    }));
+  const [invoiceSettings, setInvoiceSettings] = useState({
+    invoiceNumber: "INV-2026-001",
+    issueDate: "26 Mar, 2026",
+    dueDate: "10 Apr, 2026",
+    currency: "₹",
+    taxRate: 18,
+    advancePaid: 0
+  });
+
+  const [columnLabels, setColumnLabels] = useState({
+    col1: "DESCRIPTION",
+    col2: "HOURS",
+    col3: "RATE",
+    col4: "TOTAL"
+  });
+
+  const invoiceRef = useRef(null);
+  const logoInputRef = useRef(null);
+
+  const calculateGroupSubtotal = useCallback((items) => {
+    return items.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0) * (parseFloat(item.price) || 0), 0);
+  }, []);
+
+  const calculateGrandTotal = useCallback(() => {
+    return groups.reduce((total, group) => total + calculateGroupSubtotal(group.items), 0);
+  }, [groups, calculateGroupSubtotal]);
+
+  const calculateTaxAmount = useCallback(() => {
+    return (calculateGrandTotal() * invoiceSettings.taxRate) / 100;
+  }, [calculateGrandTotal, invoiceSettings.taxRate]);
+
+  const calculateBalanceDue = useCallback(() => {
+    return calculateGrandTotal() + calculateTaxAmount() - invoiceSettings.advancePaid;
+  }, [calculateGrandTotal, calculateTaxAmount, invoiceSettings.advancePaid]);
+
+  const addNewDateGroup = () => {
+    const newDate = prompt("Enter date (e.g., 30 Mar 2026)", "30 Mar 2026");
+    if (newDate) {
+      const newGroup = {
+        id: uuidv4(),
+        date: newDate,
+        items: [{ id: uuidv4(), description: "New Service", quantity: "1", price: "0" }]
+      };
+      setGroups([...groups, newGroup]);
+    }
   };
-  reader.readAsDataURL(file);
-};
+
+  const deleteGroup = (groupId) => {
+    if (groups.length === 1) {
+      alert("Cannot delete the last group. Add a new group first.");
+      return;
+    }
+    setGroups(groups.filter(group => group.id !== groupId));
+  };
+
+  const updateGroupDate = (groupId, newDate) => {
+    setGroups(groups.map(group =>
+      group.id === groupId ? { ...group, date: newDate } : group
+    ));
+  };
+
+  const addItemToGroup = (groupId) => {
+    setGroups(groups.map(group =>
+      group.id === groupId
+        ? { ...group, items: [...group.items, { id: uuidv4(), description: "New Service", quantity: "1", price: "0" }] }
+        : group
+    ));
+  };
+
+  const updateItem = (groupId, itemId, field, value) => {
+    setGroups(groups.map(group =>
+      group.id === groupId
+        ? {
+            ...group,
+            items: group.items.map(item =>
+              item.id === itemId ? { ...item, [field]: value } : item
+            )
+          }
+        : group
+    ));
+  };
+
+  const deleteItem = (groupId, itemId) => {
+    setGroups(groups.map(group =>
+      group.id === groupId
+        ? { ...group, items: group.items.filter(item => item.id !== itemId) }
+        : group
+    ));
+  };
+
+  const handleLogoUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setCompanyInfo({ ...companyInfo, logo: reader.result });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDownloadPDF = async () => {
+    const element = invoiceRef.current;
+    if (!element) return;
+
+    const cloneElement = element.cloneNode(true);
+    cloneElement.style.width = '794px';
+    cloneElement.style.margin = '0';
+    cloneElement.style.padding = '40px';
+    cloneElement.style.backgroundColor = '#ffffff';
+    
+    const tempContainer = document.createElement('div');
+    tempContainer.style.position = 'absolute';
+    tempContainer.style.left = '-9999px';
+    tempContainer.style.top = '-9999px';
+    tempContainer.appendChild(cloneElement);
+    document.body.appendChild(tempContainer);
+
+    const opt = {
+      margin: [0.5, 0.5, 0.5, 0.5],
+      filename: `Invoice_${invoiceSettings.invoiceNumber}.pdf`,
+      image: { type: 'jpeg', quality: 1.0 },
+      html2canvas: { 
+        scale: 3, 
+        letterRendering: true,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      },
+      jsPDF: { 
+        unit: 'in', 
+        format: 'a4', 
+        orientation: 'portrait' 
+      }
+    };
+
+    try {
+      await html2pdf().set(opt).from(cloneElement).save();
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      alert('Error generating PDF. Please try again.');
+    } finally {
+      document.body.removeChild(tempContainer);
+    }
+  };
+
   return (
-    <div style={{ background: "#f1f5f9", minHeight: "100vh", display: "flex", padding: "40px", gap: "40px" }}>
-      <style jsx global>{`
-        .sidebar-scroll::-webkit-scrollbar { width: 6px; }
-        .sidebar-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
-        .sidebar-scroll::-webkit-scrollbar-thumb { 
-          background: linear-gradient(to bottom, #FF6A3D, #B900FF); 
-          border-radius: 10px; 
-        }
-      `}</style>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 p-6">
+      <div className="flex flex-col xl:flex-row gap-8 max-w-[1600px] mx-auto">
+        {/* SIDEBAR */}
+        <div className="xl:w-[440px] w-full bg-white rounded-2xl shadow-xl p-6 xl:sticky xl:top-6 h-fit xl:max-h-[calc(100vh-48px)] overflow-y-auto">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-6 pb-4 border-b-2 border-gray-100">
+            <h2 className="text-2xl font-extrabold bg-gradient-to-r from-orange-500 to-purple-600 bg-clip-text text-transparent">
+              📅 Invoice Studio
+            </h2>
+            <span className="bg-gradient-to-r from-orange-50 to-purple-50 rounded-full px-3 py-1 text-xs font-semibold text-purple-600">
+              26 Mar 2026
+            </span>
+          </div>
 
-      <div className="sidebar-scroll" style={sidebarStyle}>
-        <h2 style={{ fontSize: "22px", fontWeight: "900", marginBottom: "25px", color: "#0f172a" }}>Invoice Editor</h2>
-        <div style={{ marginBottom: "12px" }}>
-  <button
-    type="button"
-    style={addBtn}
-    onClick={() => fileInputRef.current.click()}
-  >
-    Upload Logo
-  </button>
+          {/* Company Logo Section */}
+          <div className="bg-gray-50 rounded-xl p-4 mb-5 border border-gray-100">
+            <div className="text-[10px] font-extrabold uppercase tracking-wider text-gray-500 mb-3">
+              🖼️ COMPANY LOGO
+            </div>
+            <button 
+              onClick={() => logoInputRef.current.click()} 
+              className="w-full bg-white border border-gray-200 rounded-full py-2.5 font-semibold text-sm hover:bg-gray-50 transition"
+            >
+              + Upload Logo
+            </button>
+            <input
+              ref={logoInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleLogoUpload}
+            />
+            {companyInfo.logo && (
+              <div className="mt-3 text-center">
+                <img src={companyInfo.logo} alt="logo" className="w-14 h-14 object-cover rounded-xl mx-auto" />
+              </div>
+            )}
+          </div>
 
-  <input
-    type="file"
-    ref={fileInputRef}
-    accept="image/*"
-    style={{ display: "none" }}
-    onChange={handleLogoUpload}
+          {/* Issued By */}
+          <div className="bg-gray-50 rounded-xl p-4 mb-5 border border-gray-100">
+            <div className="text-[10px] font-extrabold uppercase tracking-wider text-gray-500 mb-3">
+              🏢 ISSUED BY
+            </div>
+            <input
+              type="text"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none mb-2"
+              value={companyInfo.name}
+              onChange={(e) => setCompanyInfo({ ...companyInfo, name: e.target.value })}
+              placeholder="Company Name"
+            />
+            <textarea
+              rows="2"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none mb-2"
+              value={companyInfo.address}
+              onChange={(e) => setCompanyInfo({ ...companyInfo, address: e.target.value })}
+              placeholder="Address"
+            />
+            <input
+              type="text"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none mb-2"
+              value={companyInfo.taxId}
+              onChange={(e) => setCompanyInfo({ ...companyInfo, taxId: e.target.value })}
+              placeholder="Tax ID / GST"
+            />
+            <div className="grid grid-cols-2 gap-2">
+              <input
+                type="text"
+                className="px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none"
+                value={companyInfo.phone}
+                onChange={(e) => setCompanyInfo({ ...companyInfo, phone: e.target.value })}
+                placeholder="Phone"
+              />
+              <input
+                type="email"
+                className="px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none"
+                value={companyInfo.email}
+                onChange={(e) => setCompanyInfo({ ...companyInfo, email: e.target.value })}
+                placeholder="Email"
+              />
+            </div>
+          </div>
+
+          {/* Bill To */}
+          <div className="bg-gray-50 rounded-xl p-4 mb-5 border border-gray-100">
+            <div className="text-[10px] font-extrabold uppercase tracking-wider text-gray-500 mb-3">
+              👤 BILL TO
+            </div>
+            <input
+              type="text"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none mb-2"
+              value={clientInfo.name}
+              onChange={(e) => setClientInfo({ ...clientInfo, name: e.target.value })}
+              placeholder="Client Name"
+            />
+            <textarea
+              rows="2"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none"
+              value={clientInfo.address}
+              onChange={(e) => setClientInfo({ ...clientInfo, address: e.target.value })}
+              placeholder="Client Address"
+            />
+          </div>
+
+          {/* Invoice Settings */}
+          <div className="bg-gray-50 rounded-xl p-4 mb-5 border border-gray-100">
+            <div className="text-[10px] font-extrabold uppercase tracking-wider text-gray-500 mb-3">
+              ⚙️ INVOICE SETTINGS
+            </div>
+            <input
+              type="text"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none mb-2"
+              value={invoiceSettings.invoiceNumber}
+              onChange={(e) => setInvoiceSettings({ ...invoiceSettings, invoiceNumber: e.target.value })}
+              placeholder="Invoice #"
+            />
+            <div className="grid grid-cols-2 gap-2 mb-2">
+              <input
+                type="text"
+                className="px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none"
+                value={invoiceSettings.issueDate}
+                onChange={(e) => setInvoiceSettings({ ...invoiceSettings, issueDate: e.target.value })}
+                placeholder="Issue Date"
+              />
+              <input
+                type="text"
+                className="px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none"
+                value={invoiceSettings.dueDate}
+                onChange={(e) => setInvoiceSettings({ ...invoiceSettings, dueDate: e.target.value })}
+                placeholder="Due Date"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-2 mb-2">
+              <input
+                type="text"
+                className="px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none"
+                value={invoiceSettings.currency}
+                onChange={(e) => setInvoiceSettings({ ...invoiceSettings, currency: e.target.value })}
+                placeholder="Currency"
+              />
+              <input
+                type="number"
+                className="px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none"
+                value={invoiceSettings.taxRate}
+                onChange={(e) => setInvoiceSettings({ ...invoiceSettings, taxRate: parseFloat(e.target.value) || 0 })}
+                placeholder="Tax %"
+              />
+            </div>
+            <input
+              type="number"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none"
+              value={invoiceSettings.advancePaid}
+              onChange={(e) => setInvoiceSettings({ ...invoiceSettings, advancePaid: parseFloat(e.target.value) || 0 })}
+              placeholder="Advance Paid Amount"
+            />
+          </div>
+
+          {/* Column Labels */}
+          <div className="bg-gray-50 rounded-xl p-4 mb-5 border border-gray-100">
+            <div className="text-[10px] font-extrabold uppercase tracking-wider text-gray-500 mb-3">
+              📋 COLUMN LABELS
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <input
+                type="text"
+                className="px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none"
+                value={columnLabels.col1}
+                onChange={(e) => setColumnLabels({ ...columnLabels, col1: e.target.value })}
+                placeholder="Col 1"
+              />
+              <input
+                type="text"
+                className="px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none"
+                value={columnLabels.col2}
+                onChange={(e) => setColumnLabels({ ...columnLabels, col2: e.target.value })}
+                placeholder="Col 2"
+              />
+              <input
+                type="text"
+                className="px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none"
+                value={columnLabels.col3}
+                onChange={(e) => setColumnLabels({ ...columnLabels, col3: e.target.value })}
+                placeholder="Col 3"
+              />
+              <input
+                type="text"
+                className="px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none"
+                value={columnLabels.col4}
+                onChange={(e) => setColumnLabels({ ...columnLabels, col4: e.target.value })}
+                placeholder="Col 4"
+              />
+            </div>
+          </div>
+
+          {/* Date Groups Editor */}
+          <div className="space-y-4 mb-5">
+            {groups.map((group) => (
+              <div key={group.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                <div className="bg-gradient-to-r from-orange-50 to-purple-50 p-3 flex gap-2 items-center">
+                  <input
+                    type="text"
+                    className="flex-1 px-3 py-1.5 border border-gray-200 rounded-lg text-sm"
+                    value={group.date}
+                    onChange={(e) => updateGroupDate(group.id, e.target.value)}
+                  />
+                  <span className="text-xs font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded-full">
+                    {invoiceSettings.currency} {calculateGroupSubtotal(group.items).toFixed(2)}
+                  </span>
+                  <button onClick={() => deleteGroup(group.id)} className="text-red-500 hover:text-red-700 text-lg">
+                    🗑️
+                  </button>
+                </div>
+                <div className="p-3 space-y-2">
+                  {group.items.map((item) => (
+                    <div key={item.id} className="flex gap-2">
+                      <input
+                        type="text"
+                        className="flex-[2.2] px-2 py-1.5 border border-gray-200 rounded-lg text-xs"
+                        value={item.description}
+                        onChange={(e) => updateItem(group.id, item.id, 'description', e.target.value)}
+                        placeholder="Description"
+                      />
+                      <input
+                        type="text"
+                        className="flex-[0.8] px-2 py-1.5 border border-gray-200 rounded-lg text-xs"
+                        value={item.quantity}
+                        onChange={(e) => updateItem(group.id, item.id, 'quantity', e.target.value)}
+                        placeholder="Qty"
+                      />
+                      <input
+                        type="text"
+                        className="flex-[1] px-2 py-1.5 border border-gray-200 rounded-lg text-xs"
+                        value={item.price}
+                        onChange={(e) => updateItem(group.id, item.id, 'price', e.target.value)}
+                        placeholder="Rate"
+                      />
+                      <button onClick={() => deleteItem(group.id, item.id)} className="w-8 bg-red-50 rounded-lg text-red-500">
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <button 
+                  onClick={() => addItemToGroup(group.id)} 
+                  className="w-[calc(100%-24px)] mx-3 mb-3 border-2 border-dashed border-gray-300 rounded-lg py-2 text-sm font-semibold text-gray-500 hover:border-orange-400 hover:text-orange-500 transition"
+                >
+                  + Add Item
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <button 
+            onClick={addNewDateGroup} 
+            className="w-full bg-gray-100 rounded-full py-3 font-bold mb-4 text-orange-600 hover:bg-gray-200 transition"
+          >
+            + Add New Date Group
+          </button>
+          
+             <button 
+            className="w-full bg-gradient-to-r mb-4 from-orange-500 to-purple-600 rounded-full py-4 font-extrabold text-white hover:shadow-lg transition"
+          >
+            📄 Preview & Print
+          </button>
+          <button 
+            onClick={handleDownloadPDF} 
+            className="w-full bg-gradient-to-r from-orange-500 to-purple-600 rounded-full py-4 font-extrabold text-white hover:shadow-lg transition"
+          >
+            📄 Download PDF Invoice
+          </button>
+        </div>
+
+        {/* INVOICE PREVIEW */}
+       <div className="flex-1 flex justify-center">
+  <InvoicePreview
+    ref={invoiceRef}
+    groups={groups}
+    companyInfo={companyInfo}
+    clientInfo={clientInfo}
+    invoiceSettings={invoiceSettings}
+    columnLabels={columnLabels}
+    calculateGroupSubtotal={calculateGroupSubtotal}
+    calculateGrandTotal={calculateGrandTotal}
+    calculateTaxAmount={calculateTaxAmount}
   />
 </div>
-        {/* ISSUED BY SECTION */}
-        <div style={sectionBox}>
-          <label style={labelHint}>Issued By (Your Info)</label>
-          <input style={inputStyle} value={invoice.companyName} onChange={(e) => setInvoice({...invoice, companyName: e.target.value})} placeholder="Company Name" />
-          <textarea style={{...inputStyle, height: "60px", marginTop: "8px"}} value={invoice.companyAddress} onChange={(e) => setInvoice({...invoice, companyAddress: e.target.value})} placeholder="Address" />
-          <input style={{...inputStyle, marginTop: "8px"}} value={invoice.taxId} onChange={(e) => setInvoice({...invoice, taxId: e.target.value})} placeholder="GST Number" />
-          <div style={{...grid2, marginTop: "8px"}}>
-            <input style={inputStyle} value={invoice.phone} onChange={(e) => setInvoice({...invoice, phone: e.target.value})} placeholder="Phone" />
-            <input style={inputStyle} value={invoice.email} onChange={(e) => setInvoice({...invoice, email: e.target.value})} placeholder="Email" />
-          </div>
-        </div>
-
-        {/* BILL TO */}
-        <div style={sectionBox}>
-          <label style={labelHint}>Bill To (Client)</label>
-          <input style={inputStyle} value={invoice.clientName} onChange={(e) => setInvoice({...invoice, clientName: e.target.value})} placeholder="Client Name" />
-          <textarea style={{...inputStyle, height: "60px", marginTop: "8px"}} value={invoice.clientAddress} onChange={(e) => setInvoice({...invoice, clientAddress: e.target.value})} placeholder="Client Address" />
-        </div>
-
-        {/* DATES & SETTINGS */}
-        <div style={sectionBox}>
-          <label style={labelHint}>Dates & Settings</label>
-          <div style={grid2}>
-            <input style={inputStyle} value={invoice.date} onChange={(e) => setInvoice({...invoice, date: e.target.value})} placeholder="Issue Date" />
-            <input style={inputStyle} value={invoice.dueDate} onChange={(e) => setInvoice({...invoice, dueDate: e.target.value})} placeholder="Due Date" />
-          </div>
-          <div style={{...grid2, marginTop: "8px"}}>
-            <input type="number" style={inputStyle} value={invoice.tax} onChange={(e) => setInvoice({...invoice, tax: e.target.value})} placeholder="Tax %" />
-            <input style={inputStyle} value={invoice.currency} onChange={(e) => setInvoice({...invoice, currency: e.target.value})} placeholder="Currency" />
-          </div>
-        </div>
-        <div style={sectionBox}>
-          <label style={labelHint}>Payment Status</label>
-          <div style={grid2}>
-            <div style={{display: 'flex', flexDirection: 'column'}}>
-               <span style={{fontSize: '10px', color: '#64748b'}}>Advance Paid</span>
-               <input 
-                 type="number" 
-                 style={inputStyle} 
-                 value={invoice.paidAmount} 
-                 onChange={(e) => setInvoice({...invoice, paidAmount: e.target.value})} 
-               />
-            </div>
-          </div>
-        </div>
-
-        {/* ITEMS */}
-        <div style={sectionBox}>
-          <label style={labelHint}>Line Items</label>
-          {invoice.items.map((item) => (
-            <div key={item.id} style={{ display: "flex", gap: "6px", marginBottom: "8px" }}>
-              <input style={{...inputStyle, flex: 2}} value={item.description} onChange={(e) => updateItem(item.id, 'description', e.target.value)} />
-              <input style={{...inputStyle, flex: 0.8}} value={item.quantity} onChange={(e) => updateItem(item.id, 'quantity', e.target.value)} />
-              <input style={{...inputStyle, flex: 1}} value={item.price} onChange={(e) => updateItem(item.id, 'price', e.target.value)} />
-              <button onClick={() => setInvoice({...invoice, items: invoice.items.filter(i => i.id !== item.id)})} style={deleteBtn}>×</button>
-            </div>
-          ))}
-          <button onClick={() => setInvoice({...invoice, items: [...invoice.items, {id: uuidv4(), description: '', quantity: '0', price: '0'}]})} style={addBtn}>+ Add Item</button>
-        </div>
-
-        <button onClick={() => downloadInvoice(invoiceRef.current)} style={downloadBtn}>Download PDF</button>
-      </div>
-
-      <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "flex-start" }}>
-        <ModernInvoice ref={invoiceRef} invoice={invoice} />
       </div>
     </div>
   );
-}
+};
 
-const sidebarStyle = { flex: "0 0 450px", background: "#fff", padding: "30px", borderRadius: "24px", boxShadow: "0 10px 40px rgba(0,0,0,0.08)", overflowY: "auto", maxHeight: "92vh" };
-const sectionBox = { background: "#f8fafc", padding: "16px", borderRadius: "16px", marginBottom: "20px", border: "1px solid #f1f5f9" };
-const labelHint = { fontSize: "10px", fontWeight: "900", color: "#94a3b8", textTransform: "uppercase", marginBottom: "12px", display: "block" };
-const inputStyle = { width: "100%", padding: "12px", border: "1px solid #e2e8f0", borderRadius: "10px", fontSize: "13px", outline: "none" };
-const grid2 = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" };
-const deleteBtn = { background: "#fee2e2", color: "#ef4444", border: "none", borderRadius: "8px", width: "30px", cursor: "pointer" };
-const addBtn = { width: "100%", padding: "10px", background: "none", border: "2px dashed #e2e8f0", borderRadius: "10px", cursor: "pointer", color: "#64748b", fontWeight: "700" };
-const downloadBtn = { width: "100%", padding: "18px", background: "linear-gradient(135deg, #FF6A3D 0%, #B900FF 100%)", color: "#fff", border: "none", borderRadius: "14px", fontWeight: "800", cursor: "pointer" };
-
+export default InvoiceGenerator;

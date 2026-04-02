@@ -11,6 +11,7 @@ import ProjectSection from './section/ProjectSection';
 import SkillsSection from './section/SkillsSection';
 import ContactSection from './section/ContactSection';
 import Navbarnew from './section/Navbarnew';
+import OmniZenithFooter from './Footer';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -41,6 +42,7 @@ export default function Portfolio({ lang, setLang }) {
 
       <section id="contact"><ContactSection /></section>
 
+      <OmniZenithFooter />
 
     </div>
   );
