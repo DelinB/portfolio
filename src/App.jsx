@@ -5,6 +5,7 @@ import Footer from './pages/Footer.jsx';
 import Portfolio from './pages/Portfolio.jsx';
 import InvoicePage from './pages/invoice/pages/InvoicePage.jsx';
 import InvoicePreview from './pages/invoice/pages/InvoicePreview.jsx';
+import ChatWidget from './pages/invoice/components/ChatWidget.js';
 
 const App = () => {
   const location = useLocation();
@@ -27,6 +28,7 @@ const App = () => {
                 <Route path="/invoice/preview" element={<InvoicePreview  lang={lang} />} />
 
       </Routes>
+      <ChatWidget />
 
     </>
   )
